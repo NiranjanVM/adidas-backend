@@ -41,6 +41,28 @@ mongoose.connect(process.env.MONGO_URI, {
   const User = require("./models/User");
   const bcrypt = require("bcryptjs");
 
+
+  async function createDefaultAdmin() {
+  try {
+    const admin = await User.findOne({ username: "admin" });
+    if (!admin) {
+      const hashed = await bcrypt.hash("admin123", 10);
+      await User.create({
+        username: "admin",
+        password: hashed,
+        role: "admin",
+      });
+      console.log("👑 Default admin created in Atlas");
+    } else {
+      console.log("Admin already exists in Atlas");
+    }
+  } catch (err) {
+    console.error("Error creating default admin:", err);
+  }
+}
+
+createDefaultAdmin();
+
   User.findOne({ username: "admin" }).then(async (admin) => {
     if (!admin) {
       const hashed = await bcrypt.hash("admin123", 10);
